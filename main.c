@@ -12,6 +12,8 @@
 
 #define TIMER_PERIOD (1023)     //  (2^10 - 1 ) / 2^15 ms = ~31ms
 
+// TODO Osposobiti LCD i napisati nesto na njemu, bez toga ne mogu da debagujem ADC
+
 uint16_t pressed_button = 0;
 uint16_t corresponding_led = 0;
 
