@@ -73,7 +73,6 @@ void LCD_init()
 
 void LCD_write_nibble(uint16_t nibble[], uint8_t val)
 {
-    P8OUT |= enable;    //  enable rising edge
 
     int i;
     for (i = 0; i < 4; i++)
@@ -85,13 +84,16 @@ void LCD_write_nibble(uint16_t nibble[], uint8_t val)
             P8OUT &= ~ lcd_data[i];
     }
 
-    __delay_cycles(t_DSW);
-
+    P8OUT |= enable;    //  enable rising edge
     P8OUT &= ~enable;   //  enable falling edge
 }
 
 void LCD_write(uint8_t rs, uint8_t val)
 {
+
+    uint16_t upper[] = {BIT7, BIT6, BIT5, BIT4};    //  set upper 4 bits
+    uint16_t lower[] = {BIT3, BIT2, BIT1, BIT0};    //  set lower 4 bits
+
 
     if (rs == 1)                        // set/clear RS depending on instruction or data
     {
@@ -102,20 +104,8 @@ void LCD_write(uint8_t rs, uint8_t val)
         P8OUT &= ~register_select;
     }
 
-    __delay_cycles(t_AS);               //  timing characteristics? page 58
-
-
-    uint16_t upper[] = {BIT7, BIT6, BIT5, BIT4};    //  set upper 4 bits
-
-    LCD_write_nibble(upper, val);
-
-    __delay_cycles(t_BETWEEN_NIBBLES);
-
-
-    uint16_t lower[] = {BIT3, BIT2, BIT1, BIT0};    //  set lower 4 bits
-
     LCD_write_nibble(lower, val);
-
+    LCD_write_nibble(upper, val);
 }
 
 
