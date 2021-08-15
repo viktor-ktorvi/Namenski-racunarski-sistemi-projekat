@@ -34,7 +34,10 @@ int main(void)
     LCD_clear();
     LCD_cursor(1);
 
-    LCD_write_integer(666777);
+    LCD_write_string("V. Todosijevic");
+    LCD_cursor(2);
+    LCD_write_string("Projekat br. 9");
+
 
 
     init_buttons();
@@ -46,6 +49,21 @@ int main(void)
 
     while (1)
     {
+        if (display_flag)
+        {
+            display_flag = 0;
+//            mean = (float)(sum / 100.0);  // sto ovo puca!?!?
+            LCD_clear();
+            LCD_cursor(1);
+            LCD_write_string("Min = ");
+            LCD_write_integer((long)min);
+            LCD_write_string(" Max = ");
+            LCD_write_integer((long)max);
+            LCD_cursor(2);
+            LCD_write_string("Sum = ");
+            LCD_write_integer((long)sum);
+
+        }
     }
 
     return 0;
@@ -150,6 +168,7 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) CCR0ISR(void)
         else if (pressed_button == buttons[1])
         {
             P4OUT ^= debug_LED;
+            display_flag = 1;     //  delayed interrupt processing
         }
     }
 
@@ -197,7 +216,7 @@ void __attribute__ ((interrupt(ADC12_VECTOR))) ADC12ISR(void)
             TA1CTL |= TACLR;
 
             int i;
-            double sum = 0;
+            sum = 0;
             min = data_array[0];
             max = data_array[0];
             for (i = 0; i < NUM_DATA_SAMPLES; i++)
@@ -211,8 +230,6 @@ void __attribute__ ((interrupt(ADC12_VECTOR))) ADC12ISR(void)
                     min = data_array[i];
 
             }
-
-            mean = sum / NUM_DATA_SAMPLES;
 
             P4OUT &= ~indicator_LED;
 

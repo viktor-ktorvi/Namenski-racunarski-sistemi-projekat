@@ -17,6 +17,7 @@
 #define TIMER_PERIOD_A1 (3277)     //  (2^15 - 1 ) / 2^15 / 10 ms = ~100ms
 
 #define NUM_DATA_SAMPLES (100)
+#define NUM_DATA_SAMPLES_DOUBLE (100.0)
 
 
 #define MAX_STR_SIZE (16)
@@ -25,13 +26,16 @@ char str_reverse_for_int[MAX_STR_SIZE + 1];
 
 char * str_for_int = NULL;
 
+int display_flag = 0;
+
 uint16_t pressed_button = 0;
 
 uint16_t data = 0x0;
 unsigned int ad_result = 0;
 uint16_t data_array[NUM_DATA_SAMPLES];
 unsigned int data_counter = 0;
-double mean = 0;
+float mean = 0;
+long sum = 0;
 int min = 0;
 int max = 0;
 
