@@ -10,12 +10,22 @@
 #include <msp430.h> 
 #include <stdint.h>
 
+void LCD_init();
+void LCD_write(uint8_t rs, uint8_t val);
+void LCD_write_nibble(uint16_t nibble[], uint8_t val);
+
 #define TIMER_PERIOD (1023)     //  (2^10 - 1 ) / 2^15 ms = ~31ms
+#define CLOCK_PERIDO (1048576)	//	1s?
+#define t_AS (1)				//	1us? > 40ns
+#define t_DSW (1)				//	1us? > 80ns
+#define t_H (1)					//	1us? > 10ns
+#define t_BETWEEN_NIBBLES (1)	//	just to be sure
 
 // TODO Osposobiti LCD i napisati nesto na njemu, bez toga ne mogu da debagujem ADC
 
 uint16_t pressed_button = 0;
 uint16_t corresponding_led = 0;
+uint8_t character = 'v';
 
 
 //  LED register positions
@@ -29,6 +39,82 @@ uint16_t buttons[] = {
                       BIT4,
                       BIT5
 };
+
+#define register_select lcd_gpios[0]
+#define enable lcd_gpios[1]
+
+uint16_t lcd_gpios[] = {
+					   BIT2,	//	register select
+					   BIT3,	//	enable
+					   BIT4,	//	4
+					   BIT5,	//	5
+					   BIT6,	//	6
+					   BIT7		//	7
+}
+
+uint16_t lcd_data[] = {
+					   BIT4,	//	4
+					   BIT5,	//	5
+					   BIT6,	//	6
+					   BIT7		//	7
+}
+
+void LCD_init()
+{
+	int i;
+	for(i = 0; i < sizeof(lcd_gpios) / sizeof(lcd_gpios[0]); i++)
+	{
+		P8DIR |= lcd_gpios[i];		//	set the LCD intended GPIO pins for output
+		P8OUT &= ~lcd_gpios[i];		//	set them to LOW
+	}
+}
+
+//	https://www.sparkfun.com/datasheets/LCD/HD44780.pdf
+
+void LCD_write_nibble(uint16_t nibble[], uint8_t val)
+{
+	P8OUT |= enable;	//	enable rising edge
+
+
+	int i;
+	for (i = 0; i < 4; i++)
+	{	
+		//	if val at position is 1 set, else clear
+		if (val & nibble[i])
+			P8OUT |= lcd_data[i];
+		else
+			P8OUT &= ~ lcd_data[i];
+	}
+
+	__delay_cycles(t_DSW);	
+
+	P8OUT &= ~enable;	//	enable falling edge
+}
+
+void LCD_write(uint8_t rs, uint8_t val)
+{
+
+	if (rs == 1)						// set/clear RS depending on instruction or data
+		P8OUT |= register_select;
+	else if (rs == 0)
+		P8OUT &= ~register_select;
+	
+	__delay_cycles(t_AS);				//	timing characteristics? page 58
+
+
+	uint16_t upper[] = {BIT7, BIT6, BIT5, BIT4};	//	set upper 4 bits
+
+	LCD_write_nibble(upper, val);
+
+	__delay_cycles(t_BETWEEN_NIBBLES)
+
+
+	uint16_t lower[] = {BIT3, BIT2, BIT1, BIT0};	//	set lower 4 bits
+
+	LCD_write_nibble(lower, val);
+
+}
+
 
 int main(void)
 {
@@ -55,6 +141,9 @@ int main(void)
 	TA0CCR0 = TIMER_PERIOD;     //  debounce period
 	TA0CCTL0 = CCIE;            //  enable CCR0 interrupt
 	TA0CTL = TASSEL__ACLK;      //  clock
+
+	LCD_init();
+	LCD_write(1, character);
 
 
 	__enable_interrupt();   //  global interrupt enable
