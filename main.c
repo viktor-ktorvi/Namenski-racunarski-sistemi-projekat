@@ -9,7 +9,7 @@
  */
 #include <msp430.h> 
 #include <stdint.h>
-
+#include <stdlib.h>
 #include "constants.h"
 //#include "lcd.h"
 
@@ -17,6 +17,7 @@ void init_buttons();
 void init_debounce_timer();
 void init_adc_timer();
 void init_adc();
+char * int2str(long num);
 
 int main(void)
 {
@@ -32,7 +33,9 @@ int main(void)
     LCD_init();
     LCD_clear();
     LCD_cursor(1);
-    LCD_write_string("Hello");
+
+    LCD_write_integer(666777);
+
 
     init_buttons();
     init_debounce_timer();
@@ -146,7 +149,7 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) CCR0ISR(void)
         }
         else if (pressed_button == buttons[1])
         {
-
+            P4OUT ^= debug_LED;
         }
     }
 
@@ -215,4 +218,40 @@ void __attribute__ ((interrupt(ADC12_VECTOR))) ADC12ISR(void)
 
         }
     }
+}
+
+/**
+ *  @brief int2str
+ *
+ *  turn integer to string
+ */
+char * int2str(long num)
+{
+
+    int i;
+    for (i = 0; i < MAX_STR_SIZE; i++)
+    {
+        str_reverse_for_int[i] = '0' + (num % 10);
+        num /= 10;
+
+        if (num == 0)
+        {
+            str_reverse_for_int[i + 1] = '\0';
+
+            break;
+        }
+
+    }
+
+    str_for_int = malloc((i + 2) * sizeof(char));
+
+    int j;
+    for (j = i; j >= 0; j--)
+    {
+        str_for_int[j] = str_reverse_for_int[i - j];
+    }
+
+    str_for_int[i + 1] = '\0';
+
+    return str_for_int;
 }

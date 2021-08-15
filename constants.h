@@ -18,6 +18,13 @@
 
 #define NUM_DATA_SAMPLES (100)
 
+
+#define MAX_STR_SIZE (16)
+
+char str_reverse_for_int[MAX_STR_SIZE + 1];
+
+char * str_for_int = NULL;
+
 uint16_t pressed_button = 0;
 
 uint16_t data = 0x0;

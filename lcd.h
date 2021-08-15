@@ -25,5 +25,6 @@ void LCD_cursor(int row);
 void LCD_write_data(uint8_t data);
 void LCD_write_char(char character);
 void LCD_write_string(char* string);
+void LCD_write_integer(long num);
 
 #endif /* LCD_H_ */

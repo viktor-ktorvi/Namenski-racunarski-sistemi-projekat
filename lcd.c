@@ -6,7 +6,9 @@
  */
 
 #include "lcd.h"
-
+char * int2str(long num);
+#include <stdlib.h>
+extern char *str_for_int;
 /**
  *  @brief LCD_init_ports
  *
@@ -142,7 +144,6 @@ void LCD_write_char(char character)
     LCD_write_data((character & 0x0F));         // write LOW of char
 }
 
-
 /**
  *  @brief LCD_write_string
  *
@@ -153,5 +154,13 @@ void LCD_write_string(char* string)
     int i;
     for (i = 0; string[i] != '\0'; i++)
         LCD_write_char(string[i]);
+}
+
+void LCD_write_integer(long num)
+{
+    LCD_write_string(int2str(num));
+
+    free(str_for_int);
+    str_for_int = NULL;
 }
 
