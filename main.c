@@ -50,14 +50,14 @@ uint16_t lcd_gpios[] = {
 					   BIT5,	//	5
 					   BIT6,	//	6
 					   BIT7		//	7
-}
+};
 
 uint16_t lcd_data[] = {
 					   BIT4,	//	4
 					   BIT5,	//	5
 					   BIT6,	//	6
 					   BIT7		//	7
-}
+};
 
 void LCD_init()
 {
