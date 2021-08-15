@@ -106,7 +106,7 @@ void LCD_write(uint8_t rs, uint8_t val)
 
 	LCD_write_nibble(upper, val);
 
-	__delay_cycles(t_BETWEEN_NIBBLES)
+	__delay_cycles(t_BETWEEN_NIBBLES);
 
 
 	uint16_t lower[] = {BIT3, BIT2, BIT1, BIT0};	//	set lower 4 bits
