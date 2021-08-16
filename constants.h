@@ -26,6 +26,10 @@ char str_reverse_for_int[MAX_STR_SIZE + 1];
 
 char * str_for_int = NULL;
 
+char * str_whole = NULL;
+char * str_decimal = NULL;
+char * str_double = NULL;
+
 int display_flag = 0;
 
 uint16_t pressed_button = 0;
@@ -34,7 +38,7 @@ uint16_t data = 0x0;
 unsigned int ad_result = 0;
 uint16_t data_array[NUM_DATA_SAMPLES];
 unsigned int data_counter = 0;
-float mean = 0;
+double mean = 0;
 long sum = 0;
 int min = 0;
 int max = 0;

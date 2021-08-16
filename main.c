@@ -10,6 +10,7 @@
 #include <msp430.h> 
 #include <stdint.h>
 #include <stdlib.h>
+#include <math.h>
 #include "constants.h"
 //#include "lcd.h"
 
@@ -18,6 +19,7 @@ void init_debounce_timer();
 void init_adc_timer();
 void init_adc();
 char * int2str(long num);
+char * double2str(double num, int num_decimals);
 
 int main(void)
 {
@@ -34,11 +36,10 @@ int main(void)
     LCD_clear();
     LCD_cursor(1);
 
+//    LCD_write_string(double2str(555333.567, 2));
     LCD_write_string("V. Todosijevic");
     LCD_cursor(2);
     LCD_write_string("Projekat br. 9");
-
-
 
     init_buttons();
     init_debounce_timer();
@@ -56,12 +57,12 @@ int main(void)
             LCD_clear();
             LCD_cursor(1);
             LCD_write_string("Min = ");
-            LCD_write_integer((long)min);
+            LCD_write_integer((long) min);
             LCD_write_string(" Max = ");
-            LCD_write_integer((long)max);
+            LCD_write_integer((long) max);
             LCD_cursor(2);
-            LCD_write_string("Sum = ");
-            LCD_write_integer((long)sum);
+            LCD_write_string("Mean = ");
+
 
         }
     }
@@ -231,6 +232,8 @@ void __attribute__ ((interrupt(ADC12_VECTOR))) ADC12ISR(void)
 
             }
 
+            mean = sum / 100.0;
+
             P4OUT &= ~indicator_LED;
 
         }
@@ -271,4 +274,41 @@ char * int2str(long num)
     str_for_int[i + 1] = '\0';
 
     return str_for_int;
+}
+
+char * double2str(double num, int num_decimals)
+{
+    long whole = trunc(num);
+    double decimal = num - whole;
+
+    str_whole = int2str(whole);
+
+    int i;
+    for (i = 0; i < num_decimals; i++)
+        decimal *= 10;
+
+    str_decimal = int2str((long) round(decimal));
+
+    int len_whole = 0;
+    for (i = 0; str_whole[i] != '\0'; i++)
+        len_whole++;
+
+    int len_decimal = 0;
+    for (i = 0; str_decimal[i] != '\0'; i++)
+        len_decimal++;
+
+    // letters + . + \0
+    str_double = malloc((len_decimal + len_whole + 2) * sizeof(char));
+
+    int j;
+    for (j = 0; j < len_whole; j++)
+        str_double[j] = str_whole[j];
+
+    str_double[len_whole] = '.';
+    for (j = 0; j < len_decimal; j++)
+        str_double[len_whole + 1 + j] = str_decimal[j];
+
+    str_double[len_whole + len_decimal + 1] = '\0';
+
+    return str_double;
 }
