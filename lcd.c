@@ -156,11 +156,16 @@ void LCD_write_string(char* string)
         LCD_write_char(string[i]);
 }
 
+/**
+ *  @brief LCD_write_string
+ *
+ *  turn integer to string, display it and free up memory
+ */
 void LCD_write_integer(long num)
 {
     LCD_write_string(int2str(num));
 
-    free(str_for_int);
+    free(str_for_int);      //  this freeing up of memory is necessary because the code is badly designed
     str_for_int = NULL;
 }
 
