@@ -44,5 +44,6 @@ void init_debounce_timer();
 void debounce_button(uint16_t button);
 void init_ADC();
 void init_adc_timer();
+void display_stats();
 
 #endif /* UTILS_H_ */

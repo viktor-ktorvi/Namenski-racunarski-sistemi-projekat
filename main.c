@@ -1,6 +1,4 @@
 #include <msp430.h> 
-#include <stdio.h>
-#include <math.h>
 #include "lcd.h"
 #include "utils.h"
 
@@ -15,8 +13,6 @@ int main(void)
     LCD_init();
     LCD_clear();
     LCD_cursor(1);
-
-    char text[MAX_TEXT_LEN + 1];
 
     LCD_write_string("V. Todosijevic");
     LCD_cursor(2);
@@ -37,24 +33,7 @@ int main(void)
         if (display_flag)
         {
             display_flag = 0;
-            LCD_clear();
-            LCD_cursor(1);
-
-            sprintf(text, "Min=%d Max=%d", minimum, maximum);
-            LCD_write_string(text);
-
-            int whole, decimal;
-            double mean;
-
-            mean = (double) sum / (double) NUM_SAMPLES;
-
-            whole = trunc(mean);
-            decimal = (int) round((mean - whole) * pow(10, NUM_DIGITS));
-
-            sprintf(text, "Mean = %d.%d", whole, decimal);
-
-            LCD_cursor(2);
-            LCD_write_string(text);
+            display_stats();
         }
     }
 

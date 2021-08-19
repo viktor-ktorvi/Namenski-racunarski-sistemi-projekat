@@ -6,8 +6,11 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
+#include <math.h>
 #include "msp430.h"
 #include "utils.h"
+#include "lcd.h"
 
 // LEDs
 const uint16_t indicator_LED = BIT3;
@@ -116,4 +119,27 @@ void init_adc_timer()
     TA1CCR0 = TIMER_PERIOD_A1;      //  conversion period
     TA1CCTL0 = CCIE;                //  enable CCR0 interrupt
     TA1CTL = TASSEL__ACLK;          //  clock
+}
+
+void display_stats()
+{
+    char text[MAX_TEXT_LEN + 1];
+    int whole, decimal;
+    double mean;
+
+    LCD_clear();
+    LCD_cursor(1);
+
+    sprintf(text, "Min=%d Max=%d", minimum, maximum);
+    LCD_write_string(text);
+
+    mean = (double) sum / (double) NUM_SAMPLES;
+
+    whole = trunc(mean);
+    decimal = (int) round((mean - whole) * pow(10, NUM_DIGITS));
+
+    sprintf(text, "Mean = %d.%d", whole, decimal);
+
+    LCD_cursor(2);
+    LCD_write_string(text);
 }
