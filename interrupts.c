@@ -67,11 +67,11 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) CCR0ISR(void)
  * Periodically start conversion.
  *
  */
-void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) A1_CCR0ISR(void)
-{
-    ADC12CTL0 |= ADC12SC;   //  start conversion
-    return;
-}
+//void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) A1_CCR0ISR(void)
+//{
+//    ADC12CTL0 |= ADC12SC;   //  start conversion
+//    return;
+//}
 
 /**
  * @brief ADC12 ISR
