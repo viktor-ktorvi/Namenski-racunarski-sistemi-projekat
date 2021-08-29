@@ -72,7 +72,6 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) CCR0ISR(void)
 //    ADC12CTL0 |= ADC12SC;   //  start conversion
 //    return;
 //}
-
 /**
  * @brief ADC12 ISR
  *
