@@ -37,29 +37,29 @@ void __attribute__ ((interrupt(PORT2_VECTOR))) P2ISR(void)
  *  Do something depending on the button if button is actually pressed
  *
  */
-void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) CCR0ISR(void)
-{
-    if ((P2IN & pressed_button) == 0) // if button is still pressed start conversion
-    {
-        if (pressed_button == start_button)
-        {
-            P4OUT |= indicator_LED;
-            TA1CTL |= MC__UP;   //  start counting up with ADC counter
-        }
-        else if (pressed_button == display_button)
-        {
-            P4OUT ^= debug_LED;
-            display_flag = 1;
-        }
-    }
-
-    TA0CTL &= ~(MC0 | MC1);     //  stop and clear debounce timer
-    TA0CTL |= TACLR;
-    P2IFG &= ~pressed_button;     //  clear button flag
-    P2IE |= pressed_button;     //  enable interrupt on button
-
-    return;
-}
+//void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) CCR0ISR(void)
+//{
+//    if ((P2IN & pressed_button) == 0) // if button is still pressed start conversion
+//    {
+//        if (pressed_button == start_button)
+//        {
+//            P4OUT |= indicator_LED;
+//            TA1CTL |= MC__UP;   //  start counting up with ADC counter
+//        }
+//        else if (pressed_button == display_button)
+//        {
+//            P4OUT ^= debug_LED;
+//            display_flag = 1;
+//        }
+//    }
+//
+//    TA0CTL &= ~(MC0 | MC1);     //  stop and clear debounce timer
+//    TA0CTL |= TACLR;
+//    P2IFG &= ~pressed_button;     //  clear button flag
+//    P2IE |= pressed_button;     //  enable interrupt on button
+//
+//    return;
+//}
 
 /**
  * @brief TIMERA1 CCR0 ISR
@@ -72,6 +72,7 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) CCR0ISR(void)
 //    ADC12CTL0 |= ADC12SC;   //  start conversion
 //    return;
 //}
+
 /**
  * @brief ADC12 ISR
  *
