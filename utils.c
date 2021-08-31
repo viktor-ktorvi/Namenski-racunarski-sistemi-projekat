@@ -1,8 +1,12 @@
-/*
- * utils.c
+/**
+ * @file utils.c
+ * @brief General helper function and variable definitions
  *
- *  Created on: Aug 18, 2021
- *      Author: msp
+ * Function definitions for initializing LEDs, buttons, timers and the ADC, as well
+ * as other general functions and global variables.
+ *
+ * @date 2021
+ * @author Viktor Todosijevic (tv170050d@student.etf.bg.ac.rs)
  */
 
 #include <stdint.h>
@@ -14,7 +18,7 @@
 
 // LEDs
 const uint16_t indicator_LED = BIT3;
-const uint16_t debug_LED = BIT6;
+const uint16_t debug_LED = BIT4;
 
 // buttons
 const uint16_t start_button = BIT4;
@@ -36,16 +40,14 @@ int display_flag = 0;
  *  set the port direction of GPIOs controlling LEDs to output and clear them
  *
  */
-void init_LEDs()
-{
-    const uint16_t leds[] = { indicator_LED, debug_LED };
+void init_LEDs() {
+	const uint16_t leds[] = { indicator_LED, debug_LED };
 
-    int i;
-    for (i = 0; i < sizeof(leds) / sizeof(leds[0]); i++)
-    {
-        P4DIR |= leds[i];   //  set to output
-        P4OUT &= ~leds[i];  //  clear output
-    }
+	int i;
+	for (i = 0; i < sizeof(leds) / sizeof(leds[0]); i++) {
+		P4DIR |= leds[i];   //  set to output
+		P4OUT &= ~leds[i];  //  clear output
+	}
 }
 
 /**
@@ -54,19 +56,17 @@ void init_LEDs()
  *  set the GPIO ports intended for the buttons to INPUT, falling edge triggering,
  *  clear interrupt flags and enable interrupts
  */
-void init_buttons()
-{
+void init_buttons() {
 
-    const uint16_t buttons[] = { start_button, display_button };
+	const uint16_t buttons[] = { start_button, display_button };
 
-    int i;
-    for (i = 0; i < sizeof(buttons) / sizeof(buttons[0]); i++)
-    {
-        P2DIR &= ~buttons[i];    //  clear for in
-        P2IES |= buttons[i];     //  falling edge
-        P2IFG &= ~buttons[i];    //  clear interrupt flag
-        P2IE |= buttons[i];      //  enable interrupt
-    }
+	int i;
+	for (i = 0; i < sizeof(buttons) / sizeof(buttons[0]); i++) {
+		P2DIR &= ~buttons[i];    //  clear for in
+		P2IES |= buttons[i];     //  falling edge
+		P2IFG &= ~buttons[i];    //  clear interrupt flag
+		P2IE |= buttons[i];      //  enable interrupt
+	}
 }
 
 /**
@@ -74,12 +74,11 @@ void init_buttons()
  *
  *  initialize timer A0 intended for debouncing buttons
  */
-void init_debounce_timer()
-{
-    //  initialize timer A
-    TA0CCR0 = TIMER_PERIOD_A0;     //  debounce period
-    TA0CCTL0 = CCIE;            //  enable CCR0 interrupt
-    TA0CTL = TASSEL__ACLK;      //  clock
+void init_debounce_timer() {
+	//  initialize timer A
+	TA0CCR0 = TIMER_PERIOD_A0;     //  debounce period
+	TA0CCTL0 = CCIE;            //  enable CCR0 interrupt
+	TA0CTL = TASSEL__ACLK;      //  clock
 }
 
 /**
@@ -87,11 +86,10 @@ void init_debounce_timer()
  *
  *  start debounce timer, clear interrput flag on that button, disable new interrupts on that button
  */
-void debounce_button(uint16_t button)
-{
-    TA0CTL |= MC__UP;           //  start debounce timer
-    P2IFG &= ~button;           //  clear button flag
-    P2IE &= ~button;            //  disable button interrupts
+void debounce_button(uint16_t button) {
+	TA0CTL |= MC__UP;           //  start debounce timer
+	P2IFG &= ~button;           //  clear button flag
+	P2IE &= ~button;            //  disable button interrupts
 }
 
 /**
@@ -99,13 +97,12 @@ void debounce_button(uint16_t button)
  *
  *  initialize ADC
  */
-void init_ADC()
-{
-    ADC12CTL0 = ADC12ON | ADC12SHT0_8;  //  turn on ADC and set sampling timer
-    ADC12CTL1 = ADC12SHP; //  set SHP to use SAMPCON; single channel single conversion
-    ADC12MCTL0 = adc_input_channel;     //  set to chosen channel
-    ADC12CTL0 |= ADC12ENC; //  enable conversion, note: to change channel disable conversion then enable it
-    ADC12IE |= BIT0;                    //  enable interrupt on ADC12MEM0
+void init_ADC() {
+	ADC12CTL0 = ADC12ON | ADC12SHT0_8;  //  turn on ADC and set sampling timer
+	ADC12CTL1 = ADC12SHP; //  set SHP to use SAMPCON; single channel single conversion
+	ADC12MCTL0 = adc_input_channel;     //  set to chosen channel
+	ADC12CTL0 |= ADC12ENC; //  enable conversion, note: to change channel disable conversion then enable it
+	ADC12IE |= BIT0;                    //  enable interrupt on ADC12MEM0
 }
 
 /**
@@ -113,33 +110,36 @@ void init_ADC()
  *
  *  initialize timer A1 - used for periodically starting ADC
  */
-void init_adc_timer()
-{
+void init_adc_timer() {
 
-    TA1CCR0 = TIMER_PERIOD_A1;      //  conversion period
-    TA1CCTL0 = CCIE;                //  enable CCR0 interrupt
-    TA1CTL = TASSEL__ACLK;          //  clock
+	TA1CCR0 = TIMER_PERIOD_A1;      //  conversion period
+	TA1CCTL0 = CCIE;                //  enable CCR0 interrupt
+	TA1CTL = TASSEL__ACLK;          //  clock
 }
 
-void display_stats()
-{
-    char text[MAX_TEXT_LEN + 1];
-    int whole, decimal;
-    double mean;
+/**
+ *  @brief display_stats
+ *
+ *  Write the samples signal stats on the LCD
+ */
+void display_stats() {
+	char text[MAX_TEXT_LEN + 1];
+	int whole, decimal;
+	double mean;
 
-    LCD_clear();
-    LCD_cursor(1);
+	LCD_clear();
+	LCD_cursor(1);
 
-    sprintf(text, "Min=%d Max=%d", minimum, maximum);
-    LCD_write_string(text);
+	sprintf(text, "Min=%d Max=%d", minimum, maximum);
+	LCD_write_string(text);
 
-    mean = (double) sum / (double) NUM_SAMPLES;
+	mean = (double) sum / (double) NUM_SAMPLES;
 
-    whole = trunc(mean);
-    decimal = (int) round((mean - whole) * pow(10, NUM_DIGITS));
+	whole = trunc(mean);
+	decimal = (int) round((mean - whole) * pow(10, NUM_DIGITS));
 
-    sprintf(text, "Mean = %d.%d", whole, decimal);
+	sprintf(text, "Mean=%d.%d", whole, decimal);
 
-    LCD_cursor(2);
-    LCD_write_string(text);
+	LCD_cursor(2);
+	LCD_write_string(text);
 }

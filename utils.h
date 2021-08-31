@@ -1,8 +1,12 @@
-/*
- * utils.h
+/**
+ * @file utils.h
+ * @brief General helper function and variable declarations
  *
- *  Created on: Aug 18, 2021
- *      Author: msp
+ * Function declarations for initializing LEDs, buttons, timers and the ADC, as well
+ * as other general functions and global variables.
+ *
+ * @date 2021
+ * @author Viktor Todosijevic (tv170050d@student.etf.bg.ac.rs)
  */
 
 #ifndef UTILS_H_

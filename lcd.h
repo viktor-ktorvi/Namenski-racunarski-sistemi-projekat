@@ -1,25 +1,53 @@
-/*
- * lcd.h
+/**
+ * @file utils.h
+ * @brief General helper function and variable declarations
  *
- *  Created on: Aug 15, 2021
- *      Author: msp
+ * Function declarations for initializing LEDs, buttons, timers and the ADC, as well
+ * as other general functions and global variables.
+ *
+ * @date 2021
+ * @author Viktor Todosijevic (tv170050d@student.etf.bg.ac.rs)
  */
 
-#ifndef LCD_H_
-#define LCD_H_
+#ifndef UTILS_H_
+#define UTILS_H_
 
 #include <stdint.h>
-#include <msp430.h>
 
+#define TIMER_PERIOD_A0 (1023)      //  (2^10 - 1 ) / 2^15 ms = ~31ms
+#define TIMER_PERIOD_A1 (3277)      //  100ms ?
+#define NUM_SAMPLES (100)
 
-void LCD_init_ports();
-void LCD_init();
-void LCD_write(uint8_t data);
-void LCD_write_instruction(uint8_t data);
-void LCD_clear();
-void LCD_cursor(int row);
-void LCD_write_data(uint8_t data);
-void LCD_write_char(char character);
-void LCD_write_string(char* string);
+#define MAX_TEXT_LEN (16)
+#define NUM_DIGITS (2)
 
-#endif /* LCD_H_ */
+// LEDs
+extern const uint16_t indicator_LED;
+extern const uint16_t debug_LED;
+
+// buttons
+extern const uint16_t start_button;
+extern const uint16_t display_button;
+uint16_t pressed_button;
+
+// ADC
+extern const uint16_t adc_input_channel;
+
+uint16_t data_array[NUM_SAMPLES];
+
+extern int counter;
+extern unsigned sum;
+extern uint16_t minimum;
+extern uint16_t maximum;
+
+extern int display_flag;
+
+void init_LEDs();
+void init_buttons();
+void init_debounce_timer();
+void debounce_button(uint16_t button);
+void init_ADC();
+void init_adc_timer();
+void display_stats();
+
+#endif /* UTILS_H_ */
